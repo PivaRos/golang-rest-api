@@ -5,6 +5,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"my-rest-api/src/structs"
 	"net/http"
 
@@ -21,9 +22,11 @@ func SignInHandler(db *mongo.Client) http.HandlerFunc {
 			return
 		}
 
+		
+
 		collection := db.Database("test1").Collection("users")
 
-		var user structs.UserResponse
+		var user structs.PublicUser
 		// Assuming the password is stored in plain text (which is not recommended in real applications)
 		err := collection.FindOne(context.TODO(), bson.M{"email": req.Email, "password": req.Password}).Decode(&user)
 		if err != nil {
@@ -32,6 +35,7 @@ func SignInHandler(db *mongo.Client) http.HandlerFunc {
 				return
 			}
 			http.Error(w, "Error querying database", http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 
