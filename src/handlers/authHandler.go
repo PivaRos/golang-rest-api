@@ -14,7 +14,7 @@ import (
 )
 
 // SignInHandler handles user sign-in requests
-func SignInHandler(db *mongo.Client) http.HandlerFunc {
+func SignInHandler(app *structs.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req structs.UserRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -22,12 +22,10 @@ func SignInHandler(db *mongo.Client) http.HandlerFunc {
 			return
 		}
 
-		
-
-		collection := db.Database("test1").Collection("users")
+		collection := app.MongoClient.Database("test1").Collection("users")
 
 		var user structs.PublicUser
-		// Assuming the password is stored in plain text (which is not recommended in real applications)
+		// Assuming the password is stored in plain text
 		err := collection.FindOne(context.TODO(), bson.M{"email": req.Email, "password": req.Password}).Decode(&user)
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
@@ -38,10 +36,21 @@ func SignInHandler(db *mongo.Client) http.HandlerFunc {
 			log.Println(err)
 			return
 		}
+		tokens, err := app.GenerateTokens(user.ID)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "Error generating token", http.StatusInternalServerError)
+			return
+		}
+
+		response := map[string]interface{}{
+			"user":   user,
+			"tokens": tokens,
+		}
 
 		// Exclude the password from the response for security reasons
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(user)
+		json.NewEncoder(w).Encode(response)
 	}
 }

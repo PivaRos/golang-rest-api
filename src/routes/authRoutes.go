@@ -10,6 +10,5 @@ import (
 func AuthRoutes(app structs.App) {
 
 	authRouter := app.Router.PathPrefix("/auth").Subrouter()
-
-	authRouter.HandleFunc("/signin", handlers.SignInHandler(app.MongoClient)).Methods("POST")
+	authRouter.HandleFunc("/signin", handlers.SignInHandler(&app)).Methods("POST")
 }

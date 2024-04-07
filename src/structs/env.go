@@ -10,7 +10,7 @@ import (
 
 type Env struct {
 	MONGO_URI                string
-	Jwt_Secret_Key           string
+	Jwt_Secret_Key           []byte
 	Access_Token_Expiration  time.Duration
 	Refresh_Token_Expiration time.Duration
 }
@@ -24,10 +24,12 @@ func (e *Env) InitEnv() {
 	if e.MONGO_URI == "" {
 		log.Fatalln("Error: no uri was found in env file")
 	}
-	e.Jwt_Secret_Key = os.Getenv("JWT_SECRET_KEY")
-	if e.Jwt_Secret_Key == "" {
+	Jwt_Secret_Key := os.Getenv("JWT_SECRET_KEY")
+	if Jwt_Secret_Key == "" {
 		log.Fatalln("Error: no JWT_SECRET_KEY was found in env file")
 	}
+	e.Jwt_Secret_Key = []byte(Jwt_Secret_Key)
+	Jwt_Secret_KeyExported = e.Jwt_Secret_Key
 	Access_Token_Expiration, AccessExpirationErr := time.ParseDuration(os.Getenv("ACCESS_TOKEN_EXPIRATION"))
 	if AccessExpirationErr != nil || Access_Token_Expiration == time.Duration(0) {
 		log.Fatalln("Error: no ACCESS_TOKEN_EXPIRATION was found in env file")
@@ -39,3 +41,5 @@ func (e *Env) InitEnv() {
 	}
 	e.Refresh_Token_Expiration = Refresh_Token_Expiration
 }
+
+var Jwt_Secret_KeyExported []byte

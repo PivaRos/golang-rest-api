@@ -19,11 +19,13 @@ func main() {
 	defer cancel()
 	defer client.Disconnect(ctx)
 
+	var MainRouter *mux.Router = mux.NewRouter()
+
 	//initialize the app struct
 	app := &structs.App{
-		Router:      mux.NewRouter(),
+		Router:      MainRouter,
 		MongoClient: client,
-		Env:         Env,
+		Env:         &Env,
 	}
 
 	routes.AuthRoutes(*app)

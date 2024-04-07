@@ -12,64 +12,71 @@ import (
 type App struct {
 	Router      *mux.Router
 	MongoClient *mongo.Client
-	Env         Env
+	Env         *Env
 }
 
-func (a *App) generateTokens(userID string) (accessToken, refreshToken string, err error) {
+func (a *App) GenerateTokens(userID string) (Tokens, error) {
+	var tokens Tokens
 	// Set expiration times for each token
-	accessTokenExpTime := time.Now().Add(15 * time.Minute)    // e.g., 15 minutes for access token
-	refreshTokenExpTime := time.Now().Add(7 * 24 * time.Hour) // e.g., 7 days for refresh token
+	accessTokenExpTime := a.Env.Access_Token_Expiration
+	refreshTokenExpTime := a.Env.Refresh_Token_Expiration
 
 	// Generate Access Token
 	accessTokenClaims := &Claims{
 		UserID: userID,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: accessTokenExpTime.Unix(),
+			ExpiresAt: time.Now().Add(accessTokenExpTime).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
 
-	accessToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims).SignedString(a.Env.Jwt_Secret_Key)
+	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims).SignedString(a.Env.Jwt_Secret_Key)
 	if err != nil {
-		return "", "", err
+		return tokens, err
 	}
+	tokens.AccessToken = accessToken
 
 	// Generate Refresh Token
 	refreshTokenClaims := &Claims{
 		UserID: userID,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: refreshTokenExpTime.Unix(),
+			ExpiresAt: time.Now().Add(refreshTokenExpTime).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
 
-	refreshToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims).SignedString(a.Env.Jwt_Secret_Key)
+	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims).SignedString(a.Env.Jwt_Secret_Key)
 	if err != nil {
-		return "", "", err
+		return tokens, err
 	}
+	tokens.RefreshToken = refreshToken
 
-	return accessToken, refreshToken, nil
+	return tokens, nil
 }
 
-func (a App) refreshToken(oldRefreshToken string) (string, string, error) {
+func (a App) RefreshToken(oldRefreshToken string) (Tokens, error) {
+	var tokens Tokens
 
 	token, err := jwt.ParseWithClaims(oldRefreshToken, Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return a.Env.Jwt_Secret_Key, nil
 	})
 	if err != nil {
-		return "", "", err
+		return tokens, err
 	}
 
 	claims, ok := token.Claims.(Claims)
 	if !ok || !token.Valid {
-		return "", "", fmt.Errorf("Invalid refresh token")
+		return tokens, fmt.Errorf("Invalid refresh token")
+	}
+	if claims.ExpiresAt < time.Now().Unix() {
+		return tokens, fmt.Errorf("Expired refresh token")
 	}
 
 	// Generate new access and refresh tokens
-	newAccessToken, newRefreshToken, err := a.generateTokens(claims.UserID)
+	newTokens, err := a.GenerateTokens(claims.UserID)
 	if err != nil {
-		return "", "", err
+		return tokens, err
 	}
 
-	return newAccessToken, newRefreshToken, nil
+	return newTokens, nil
 }
