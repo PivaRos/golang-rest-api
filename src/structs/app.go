@@ -18,6 +18,8 @@ type App struct {
 	Env         *Env
 }
 
+var AppMain *App
+
 func (a *App) GenerateTokens(userID string, role Role) (Tokens, error) {
 	var tokens Tokens
 	// Set expiration times for each token

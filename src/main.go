@@ -22,16 +22,16 @@ func main() {
 	var MainRouter *mux.Router = mux.NewRouter()
 
 	//initialize the app struct
-	app := &structs.App{
+	structs.AppMain = &structs.App{
 		Router:      MainRouter,
 		MongoClient: client,
 		Env:         &Env,
 	}
 
-	routes.AuthRoutes(*app)
-	routes.UserRoutes(*app)
+	routes.AuthRoutes(*structs.AppMain)
+	routes.UserRoutes(*structs.AppMain)
 
 	log.Println("Server is starting on port 8000...")
-	log.Fatal(http.ListenAndServe(":8000", app.Router))
+	log.Fatal(http.ListenAndServe(":8000", structs.AppMain.Router))
 
 }

@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"my-rest-api/src/services"
 	"my-rest-api/src/structs"
 	"net/http"
 
@@ -21,7 +22,6 @@ func SignInHandler(app *structs.App) http.HandlerFunc {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-
 		collection := app.MongoClient.Database("test1").Collection("users")
 
 		var user structs.PublicUser
@@ -52,5 +52,19 @@ func SignInHandler(app *structs.App) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(response)
+	}
+}
+func SignUpHandler(app *structs.App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		//! fix validation
+		var req services.UserCreate
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		// Exclude the password from the response for security reasons
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
 	}
 }
