@@ -1,13 +1,15 @@
 package middlewares
 
 import (
+	"context"
 	"my-rest-api/src/structs"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-func AuthenticateMiddleware(roles []structs.Role) func(http.Handler) http.Handler {
+func AuthenticateMiddleware(roles []structs.Role, app *structs.App) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tokenString := r.Header.Get("Authorization")
@@ -31,6 +33,13 @@ func AuthenticateMiddleware(roles []structs.Role) func(http.Handler) http.Handle
 					}
 				}
 				if found {
+					filter := bson.M{"accessToken": tokenString}
+					result := app.MongoClient.Database(app.Env.Db).Collection("users").FindOne(context.TODO(), filter)
+					if result.Err() != nil {
+						w.WriteHeader(http.StatusUnauthorized)
+						return
+					}
+
 					next.ServeHTTP(w, r)
 					return
 				}
