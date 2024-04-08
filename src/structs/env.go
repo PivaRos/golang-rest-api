@@ -13,6 +13,7 @@ type Env struct {
 	Jwt_Secret_Key           []byte
 	Access_Token_Expiration  time.Duration
 	Refresh_Token_Expiration time.Duration
+	Db                       string
 }
 
 func (e *Env) InitEnv() {
@@ -40,6 +41,10 @@ func (e *Env) InitEnv() {
 		log.Fatalln("Error: no REFRESH_TOKEN_EXPIRATION was found in env file")
 	}
 	e.Refresh_Token_Expiration = Refresh_Token_Expiration
+	e.Db = os.Getenv("DB")
+	if e.Db == "" {
+		log.Fatalln("Error: no DB was found in env file")
+	}
 }
 
 var Jwt_Secret_KeyExported []byte

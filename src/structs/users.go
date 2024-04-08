@@ -6,8 +6,8 @@ type Role string
 
 const (
 	Rider   Role = "Rider"
-	admin   Role = "Admin"
-	support Role = "Support"
+	Admin   Role = "Admin"
+	Support Role = "Support"
 	Driver  Role = "Driver"
 )
 
@@ -41,4 +41,5 @@ type PrivateUser struct {
 	IsEmailVerified   bool      `json:"isEmailVerified"`
 	IsActive          bool      `json:"isActive"`
 	FcmToken          string    `json:"fcmToken"`
+	AccessToken       string    `json:"accessToken"`
 }

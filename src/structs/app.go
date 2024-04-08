@@ -1,11 +1,14 @@
 package structs
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -52,6 +55,16 @@ func (a *App) GenerateTokens(userID string, role Role) (Tokens, error) {
 		return tokens, err
 	}
 	tokens.RefreshToken = refreshToken
+
+	Id, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return tokens, err
+	}
+	result, err := a.MongoClient.Database(a.Env.Db).Collection("users").UpdateByID(context.TODO(), Id, bson.M{"$set": bson.M{"accessToken": tokens.AccessToken}})
+	if err != nil {
+		return tokens, err
+	}
+	_ = result // just to remove message
 
 	return tokens, nil
 }
