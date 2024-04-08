@@ -10,6 +10,9 @@ import (
 func UserRoutes(app structs.App) {
 
 	userRouter := app.Router.PathPrefix("/user").Subrouter()
-	userRouter.Use(middlewares.AuthenticateMiddleware)
+
+	roles := []structs.Role{"Admin", "Support", "Driver"}
+	userRouter.Use(middlewares.AuthenticateMiddleware(roles))
+
 	userRouter.HandleFunc("/{id}", handlers.GetUser(app.MongoClient)).Methods("GET")
 }

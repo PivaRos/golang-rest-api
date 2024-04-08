@@ -15,7 +15,7 @@ type App struct {
 	Env         *Env
 }
 
-func (a *App) GenerateTokens(userID string) (Tokens, error) {
+func (a *App) GenerateTokens(userID string, role Role) (Tokens, error) {
 	var tokens Tokens
 	// Set expiration times for each token
 	accessTokenExpTime := a.Env.Access_Token_Expiration
@@ -23,6 +23,7 @@ func (a *App) GenerateTokens(userID string) (Tokens, error) {
 
 	// Generate Access Token
 	accessTokenClaims := &Claims{
+		Role:   role,
 		UserID: userID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(accessTokenExpTime).Unix(),
@@ -38,6 +39,7 @@ func (a *App) GenerateTokens(userID string) (Tokens, error) {
 
 	// Generate Refresh Token
 	refreshTokenClaims := &Claims{
+		Role:   role,
 		UserID: userID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(refreshTokenExpTime).Unix(),
@@ -54,7 +56,7 @@ func (a *App) GenerateTokens(userID string) (Tokens, error) {
 	return tokens, nil
 }
 
-func (a App) RefreshToken(oldRefreshToken string) (Tokens, error) {
+func (a App) RefreshToken(oldRefreshToken string, role Role) (Tokens, error) {
 	var tokens Tokens
 
 	token, err := jwt.ParseWithClaims(oldRefreshToken, Claims{}, func(token *jwt.Token) (interface{}, error) {
@@ -73,7 +75,7 @@ func (a App) RefreshToken(oldRefreshToken string) (Tokens, error) {
 	}
 
 	// Generate new access and refresh tokens
-	newTokens, err := a.GenerateTokens(claims.UserID)
+	newTokens, err := a.GenerateTokens(claims.UserID, claims.Role)
 	if err != nil {
 		return tokens, err
 	}

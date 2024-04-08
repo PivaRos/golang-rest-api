@@ -36,7 +36,7 @@ func SignInHandler(app *structs.App) http.HandlerFunc {
 			log.Println(err)
 			return
 		}
-		tokens, err := app.GenerateTokens(user.ID)
+		tokens, err := app.GenerateTokens(user.ID, structs.Role(user.Role))
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "Error generating token", http.StatusInternalServerError)
