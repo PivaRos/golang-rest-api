@@ -1,6 +1,9 @@
 package structs
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type Role string
 
@@ -14,6 +17,16 @@ const (
 type UserRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+func (rq *UserRequest) ValidateUserRequest() error {
+	if rq.Email == "" || len(rq.Email) < 5 {
+		return errors.New("invalid Email")
+	}
+	if rq.Password == "" || len(rq.Password) < 6 {
+		return errors.New("invalid Password")
+	}
+	return nil
 }
 
 type PublicUser struct {
