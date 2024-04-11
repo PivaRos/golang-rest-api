@@ -4,15 +4,16 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"my-rest-api/src/structs"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func ConnectMongo(uri string) (*mongo.Client, context.Context, context.CancelFunc) {
+func ConnectMongo(env *structs.Env) (*mongo.Client, context.Context, context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(env.MONGO_URI))
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
@@ -21,7 +22,6 @@ func ConnectMongo(uri string) (*mongo.Client, context.Context, context.CancelFun
 	if err := client.Ping(ctx, nil); err != nil {
 		log.Fatalf("Failed to ping MongoDB: %v", err)
 	}
-
 	fmt.Println("Connected to MongoDB!")
 	return client, ctx, cancel
 }

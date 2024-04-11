@@ -15,7 +15,7 @@ func main() {
 	var Env structs.Env
 	Env.InitEnv()
 
-	client, ctx, cancel := utils.ConnectMongo(Env.MONGO_URI)
+	client, ctx, cancel := utils.ConnectMongo(&Env)
 	defer cancel()
 	defer client.Disconnect(ctx)
 
