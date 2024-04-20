@@ -22,7 +22,7 @@ func SignInHandler(app *structs.App) http.HandlerFunc {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		collection := app.MongoClient.Database("test1").Collection("users")
+		collection := app.MongoClient.Database(app.Env.Db).Collection("users")
 
 		var user structs.PublicUser
 		// Assuming the password is stored in plain text
