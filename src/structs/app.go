@@ -7,6 +7,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	gobus "github.com/pivaros/GoBus/src"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,6 +17,7 @@ type App struct {
 	Router      *mux.Router
 	MongoClient *mongo.Client
 	Env         *Env
+	GoBus       *gobus.GoBus
 }
 
 var AppMain *App

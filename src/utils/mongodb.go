@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"my-rest-api/src/structs"
 	"time"
@@ -22,6 +21,6 @@ func ConnectMongo(env *structs.Env) (*mongo.Client, context.Context, context.Can
 	if err := client.Ping(ctx, nil); err != nil {
 		log.Fatalf("Failed to ping MongoDB: %v", err)
 	}
-	fmt.Println("Connected to MongoDB!")
+	log.Println("Connected to MongoDB!")
 	return client, ctx, cancel
 }

@@ -8,11 +8,11 @@ import (
 type Role string
 
 const (
-	Rider   Role = "Rider"
+	User    Role = "User"
 	Admin   Role = "Admin"
 	Support Role = "Support"
-	Driver  Role = "Driver"
 )
+
 
 type UserRequest struct {
 	Email    string `json:"email"`

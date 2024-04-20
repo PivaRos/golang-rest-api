@@ -7,12 +7,12 @@ import (
 	"my-rest-api/src/structs"
 )
 
-func UserRoutes(app structs.App) {
+func UserRoutes(app *structs.App) {
 
 	userRouter := app.Router.PathPrefix("/user").Subrouter()
 
-	roles := []structs.Role{structs.Driver, structs.Support, structs.Driver, structs.Rider} //* which roles can access this route
-	userRouter.Use(middlewares.AuthenticateMiddleware(roles, &app))
+	roles := []structs.Role{structs.User, structs.Support, structs.Support, structs.Admin} //* which roles can access this route
+	userRouter.Use(middlewares.AuthenticateMiddleware(roles, app))
 
 	userRouter.HandleFunc("/{id}", handlers.GetUser(app.MongoClient)).Methods("GET")
 }

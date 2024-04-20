@@ -14,6 +14,7 @@ type Env struct {
 	Access_Token_Expiration  time.Duration
 	Refresh_Token_Expiration time.Duration
 	Db                       string
+	PORT                     string
 }
 
 func (e *Env) InitEnv() {
@@ -44,6 +45,10 @@ func (e *Env) InitEnv() {
 	e.Db = os.Getenv("DB")
 	if e.Db == "" {
 		log.Fatalln("Error: no DB was found in env file")
+	}
+	e.PORT = os.Getenv("PORT")
+	if e.PORT == "" {
+		log.Fatalln("Error: no PORT was found in env file")
 	}
 }
 
