@@ -52,6 +52,6 @@ func main() {
 	routes.TransportationRoutes(structs.AppMain)
 
 	log.Println("Server is starting on port " + Env.PORT)
-	log.Fatal(http.ListenAndServe(":"+Env.PORT, structs.AppMain.Router))
+	http.ListenAndServe(":"+Env.PORT, structs.AppMain.Router)
 
 }
