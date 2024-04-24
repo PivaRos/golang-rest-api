@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/gorilla/mux v1.8.1
-	go.mongodb.org/mongo-driver v1.14.0
+	go.mongodb.org/mongo-driver v1.15.0
 )
 
 require (
